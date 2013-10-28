@@ -10,6 +10,10 @@ from forms_builder.forms import fields
 from forms_builder.forms import settings
 from forms_builder.forms.utils import now, slugify, unique_slug
 
+# Impel custom
+from django.contrib.contenttypes import generic
+from impel.api.models import Image
+
 
 STATUS_DRAFT = 1
 STATUS_PUBLISHED = 2
@@ -238,6 +242,11 @@ class AbstractFieldEntry(models.Model):
 
 class FormEntry(AbstractFormEntry):
     form = models.ForeignKey("Form", related_name="entries")
+
+    # Custom fields for Impel
+    images = generic.GenericRelation(Image,
+                                     content_type_field='owner_type',
+                                     object_id_field='owner_id')  # Not a DB field - just used to find owned images
 
 
 class FieldEntry(AbstractFieldEntry):
