@@ -12,7 +12,7 @@ from forms_builder.forms.utils import now, slugify, unique_slug
 
 # Impel custom
 from django.contrib.contenttypes import generic
-from impel.api.models import Image
+from api.models import Image
 
 
 STATUS_DRAFT = 1
