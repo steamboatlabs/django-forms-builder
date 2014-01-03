@@ -13,7 +13,8 @@ from forms_builder.forms.utils import now, slugify, unique_slug
 # Impel custom
 from django.contrib.contenttypes import generic
 from api.models import Image
-
+from django.dispatch import receiver
+from django.db.models import signals as db_signals
 
 STATUS_DRAFT = 1
 STATUS_PUBLISHED = 2
@@ -277,3 +278,12 @@ class Field(AbstractField):
         fields_after = self.form.fields.filter(order__gte=self.order)
         fields_after.update(order=models.F("order") - 1)
         super(Field, self).delete(*args, **kwargs)
+
+
+# impel
+@receiver(db_signals.post_delete, sender=Field)
+def remove_related_field_entries(sender, instance, **kwargs):
+    # since fieldentries just use an integer field to connect to a field we need to manually delete them when the
+    # corresponding field is deleted
+    FieldEntry.objects.filter(field_id=instance.id).delete()
+
