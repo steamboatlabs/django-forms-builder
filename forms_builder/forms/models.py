@@ -15,6 +15,7 @@ from django.contrib.contenttypes import generic
 from api.models import Image
 from django.dispatch import receiver
 from django.db.models import signals as db_signals
+from caching.base import CachingManager, CachingMixin, CachingQuerySet
 
 STATUS_DRAFT = 1
 STATUS_PUBLISHED = 2
@@ -137,8 +138,10 @@ class FieldManager(models.Manager):
     def visible(self):
         return self.filter(visible=True)
 
+    def get_query_set(self):
+        return CachingQuerySet(self.model, using=self._db)
 
-class AbstractField(models.Model):
+class AbstractField(CachingMixin, models.Model):
     """
     A field for a user-built form.
     """
